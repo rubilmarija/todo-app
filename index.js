@@ -1,39 +1,56 @@
-const express = require("express");
 const morgan = require("morgan");
+const express = require("express");
 const bodyParser = require("body-parser");
-require("dotenv").config();
-const { Sequelize, DataTypes } = require("sequelize");
-const sequelize = new Sequelize(
-  `postgres://${process.env.USERNAME}:${process.env.PASSWORD}@${process.env.URL}:${process.env.PORT}/${process.env.DBNAME}`
-);
-const Task = require("./task");
 
-const app = express();
+require("dotenv").config(); // library for environment variables
 
-const main = async () => {
-  try {
-    await sequelize.authenticate();
-    console.log("Connection has been established successfully.");
-    // await sequelize.sync({ force: true });
-  } catch (error) {
-    console.error("Unable to connect to the database:", error);
-  }
+const { initializeDB } = require("./database");
+
+const passDbAroundMiddleware = (db) => {
+  return (req, res, next) => {
+    req.db = db;
+    next();
+  };
 };
 
-app.post("/task", async (req, res) => {
-  const { title, completed } = req.body;
-  const task = await Task.create({ title, completed });
-  res.json(task.toJSON());
-});
+// putting everything inside a function to avoid global variables
+const main = async () => {
+  const db = await initializeDB();
 
-app.use(morgan("tiny"));
+  const app = express(); // creates express app
 
-const port = 5500;
+	// middleware
+  app.use(morgan("tiny")); // Logs HTTP requests to the console in a clean format.
+  app.use(bodyParser.json()); // Parses incoming request bodies in JSON format
+  app.use(passDbAroundMiddleware(db));
 
-app.use(bodyParser.json());
+	// get all existing tasks
+  app.get("/tasks", async (req, res) => {
+    const tasks = await req.db.Task.findAll();
+    res.json(tasks.map((t) => t.toJSON()));
+    console.log(tasks);
+    res.end();
+  });
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
-});
+	// create new task
+  app.post("/task", async (req, res) => {
+    const { title, completed } = req.body;
+    const task = await req.db.Task.create({ title, completed });
+    res.json(task.toJSON());
+  });
+
+	app.patch("/task/:id", async (req, res) => {
+    const { completed } = req.body;
+  	const { id } = req.params;
+  	await req.db.Task.update({ completed }, { where: { id } });
+  	res.end();
+  });
+
+	// port
+  const port = 3000;
+  app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`);
+  });
+};
 
 main();
