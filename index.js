@@ -39,11 +39,26 @@ const main = async () => {
     res.json(task.toJSON());
   });
 
+  // update completed status
 	app.patch("/task/:id", async (req, res) => {
     const { completed } = req.body;
   	const { id } = req.params;
   	await req.db.Task.update({ completed }, { where: { id } });
   	res.end();
+  });
+
+  // delete task
+  app.delete("/task/:id", async (req, res) => {
+    const { id } = req.params;
+    await req.db.Task.destroy({ where: { id } });
+  	res.end();
+  });
+
+  // get specific task
+  app.get("/task/:id", async (req, res) => {
+    const { id } = req.params;
+    const task = await req.db.Task.findAll({ where: { id } });
+    res.json(task);
   });
 
 	// port
