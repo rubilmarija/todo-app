@@ -8,12 +8,41 @@
     <link rel="stylesheet" href="todo.css" />
   </head>
   <body>
-    <form>
-      <h2>To-do list</h2>
-      <div class="container">
-        <input type="text" />
-        <button>Add</button>
-      </div>
+    <h1>To-do</h1>
+    <form id="form" method="post" class="container">
+      <input class="input-field" id="todo" type="text" value="" /> <br />
+      <input class="submit-button" type="submit" value="Add todo" />
     </form>
+    <div class="results" id="results"></div>
+
+    <script>
+      let form = document.getElementById("form");
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        let todo = document.getElementById("todo").value;
+        console.log(todo);
+
+        // fetch post request
+        fetch("/task", {
+          method: "POST",
+          body: JSON.stringify({
+            title: todo,
+          }),
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+          },
+        })
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (data) {
+            console.log(data);
+            var results = document.getElementById("results");
+            results.innerHTML = `<div class="todo-design"><p>${data.title}</p></div>`;
+          });
+      });
+    </script>
   </body>
 </html>
