@@ -14,52 +14,10 @@
       <input class="submit-button" type="submit" value="Add todo" />
     </form>
     <ul id="todoitems"></ul>
-    <div class="results" id="results"></div>
-
     <script>
-      let form = document.getElementById("form");
-
-      form.addEventListener("submit", async function (e) {
-        e.preventDefault();
-
-        // let items = data.map(function (todoitem) {
-        //   let li = document.createElement("li");
-        //   let task = document.createElement("h2");
-
-        //   task.innerHTML = `${todoitem.task}`;
-
-        //   li.appendChild(task);
-        //   list.appendChild(li);
-        // });
-
-        // ul.appendChild(list);
-
-        let todo = document.getElementById("todo").value;
-        console.log(todo);
-
-        // fetch post request
-        fetch("/task", {
-          method: "POST",
-
-          body: JSON.stringify({
-            title: todo,
-          }),
-          headers: {
-            "Content-Type": "application/json; charset=UTF-8",
-          },
-        })
-          .then(function (response) {
-            return response.json();
-          })
-          .then(function (data) {
-            console.log(data);
-            var results = document.getElementById("results");
-            results.innerHTML = `<div class="todo-design"><p>${data.title}</p></div>`;
-          });
-      });
-
       const getAllListItems = async () => {
         const ul = document.getElementById("todoitems");
+
         const url = "104.199.12.40/tasks";
 
         const response = await fetch("/tasks", {
@@ -75,14 +33,31 @@
 
         for (let item of data) {
           let li = document.createElement("li");
+          let statusCheckbox = document.createElement("input");
+          statusCheckbox.setAttribute("type", "checkbox");
+
           li.id = item.id;
           li.innerHTML = `${item.title}`;
 
           ul.appendChild(li);
-        }
+          li.appendChild(statusCheckbox);
+        };
       };
 
       getAllListItems();
+
+      // const editStatus = async () => {
+      //   const statusCheckbox = document.getElementById("status-checkbox");
+      //   const url = "104.199.12.40/task/:id";
+
+      //   const task = await fetch("/task/:id", {
+      //     method: "PATCH",
+      //     headers: {
+      //       "Content-Type": "application/json; charset=UTF-8",
+      //     },
+      //   });
+      // };
+
     </script>
   </body>
 </html>
