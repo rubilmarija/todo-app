@@ -13,13 +13,26 @@
       <input class="input-field" id="todo" type="text" value="" /> <br />
       <input class="submit-button" type="submit" value="Add todo" />
     </form>
+    <ul id="todoitems"></ul>
     <div class="results" id="results"></div>
 
     <script>
       let form = document.getElementById("form");
 
-      form.addEventListener("submit", function (e) {
+      form.addEventListener("submit", async function (e) {
         e.preventDefault();
+
+        // let items = data.map(function (todoitem) {
+        //   let li = document.createElement("li");
+        //   let task = document.createElement("h2");
+
+        //   task.innerHTML = `${todoitem.task}`;
+
+        //   li.appendChild(task);
+        //   list.appendChild(li);
+        // });
+
+        // ul.appendChild(list);
 
         let todo = document.getElementById("todo").value;
         console.log(todo);
@@ -27,6 +40,7 @@
         // fetch post request
         fetch("/task", {
           method: "POST",
+
           body: JSON.stringify({
             title: todo,
           }),
@@ -43,6 +57,32 @@
             results.innerHTML = `<div class="todo-design"><p>${data.title}</p></div>`;
           });
       });
+
+      const getAllListItems = async () => {
+        const ul = document.getElementById("todoitems");
+        const url = "104.199.12.40/tasks";
+
+        const response = await fetch("/tasks", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+          },
+        });
+
+        const data = await response.json();
+
+        console.log(data);
+
+        for (let item of data) {
+          let li = document.createElement("li");
+          li.id = item.id;
+          li.innerHTML = `${item.title}`;
+
+          ul.appendChild(li);
+        }
+      };
+
+      getAllListItems();
     </script>
   </body>
 </html>
