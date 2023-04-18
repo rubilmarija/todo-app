@@ -10,69 +10,10 @@
   <body>
     <h1>To-do</h1>
     <form id="form" method="post" class="container">
-      <input class="input-field" id="todo" type="text" value="" /> <br />
+      <input class="input-field" id="new-task" type="text" value="" /> <br />
       <input class="submit-button" type="submit" value="Add todo" />
     </form>
     <ul id="todoitems"></ul>
-    <script>
-      const getAllListItems = async () => {
-        const ul = document.getElementById("todoitems");
-
-        const url = "104.199.12.40/tasks";
-
-        const response = await fetch("/tasks", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json; charset=UTF-8",
-          },
-        });
-
-        const data = await response.json();
-
-        console.log(data);
-
-        for (let item of data) {
-          let li = document.createElement("li");
-          let statusCheckbox = document.createElement("input");
-          statusCheckbox.setAttribute("type", "checkbox");
-          statusCheckbox.setAttribute("id", `checkbox-${item.id}`);
-
-          li.id = item.id;
-          li.innerHTML = `${item.title}`;
-
-          ul.appendChild(li);
-          li.appendChild(statusCheckbox);
-
-          statusCheckbox.addEventListener("change", async function (e) {
-            e.preventDefault();
-
-            const itemId = e.target.parentNode.id;
-            const checkboxId = e.target.id;
-
-            await editStatus(itemId, checkboxId);
-          });
-        }
-      };
-
-      getAllListItems();
-
-      const editStatus = async (id, checkboxId) => {
-        console.log("editStatus() called for item with id:", id);
-        const statusCheckbox = document.getElementById(checkboxId);
-        const url = `/task/${id}`;
-
-        const completed = statusCheckbox.checked;
-
-        const response = await fetch(url, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json; charset=UTF-8",
-          },
-          body: JSON.stringify({ completed: completed }),
-        });
-
-        console.log("response:", response);
-      };
-    </script>
+    <script src="./frontend.js"></script>
   </body>
 </html>
