@@ -23,11 +23,17 @@ const createItem = async (item) => {
   statusCheckbox.setAttribute("type", "checkbox");
   statusCheckbox.setAttribute("id", `checkbox-${item.id}`);
 
+  let deleteButton = document.createElement("button");
+  deleteButton.setAttribute("content", "test content");
+  deleteButton.textContent = "Delete";
+  deleteButton.setAttribute("id", `delete-btn-${item.id}`);
+
   li.id = item.id;
   li.innerHTML = `${item.title}`;
 
   ul.appendChild(li);
   li.appendChild(statusCheckbox);
+  li.appendChild(deleteButton);
 
   statusCheckbox.addEventListener("change", async function (e) {
     e.preventDefault();
@@ -37,6 +43,15 @@ const createItem = async (item) => {
 
     await editStatus(itemId, checkboxId);
   });
+
+  deleteButton.addEventListener('click', async function (e) {
+    e.preventDefault();
+
+    const itemId = e.target.parentNode.id;
+    const deleteButtonId = e.target.id;
+
+    await deleteTask(itemId, deleteButtonId);
+  })
 };
 
 getAllListItems();
@@ -82,5 +97,21 @@ const addNewTask = async () => {
   let data = await response.json();
   console.log(data);
 
-	createItem(data);
+  createItem(data);
 };
+
+const deleteTask = async (itemId) => {
+  const task = document.getElementById(itemId);
+  const url = `/task/${itemId}`;
+
+  const response = await fetch(url, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json; charset=UTF-8",
+    },
+  });
+
+  console.log("response:", response);
+
+  task.remove();
+}
