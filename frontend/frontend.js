@@ -57,7 +57,7 @@ const createItem = async (item) => {
 };
 
 const addNewTask = async () => {
-  let newTaskTitle = document.getElementById("new-task").value;
+  let newTaskTitle = document.getElementById("task-input").value;
   console.log(newTaskTitle);
 
   const response = await fetch("/task", {
@@ -80,6 +80,10 @@ const addNewTask = async () => {
 form.addEventListener("submit", async function (e) {
   e.preventDefault();
   await addNewTask();
+
+  const taskInput = document.getElementById("task-input");
+
+  taskInput.value = "";
 });
 
 const editStatus = async (itemId, checkboxId) => {
