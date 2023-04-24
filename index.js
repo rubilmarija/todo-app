@@ -19,49 +19,122 @@ const main = async () => {
 
   const app = express(); // creates express app
 
-	// middleware
+  // middleware
   app.use(morgan("tiny")); // Logs HTTP requests to the console in a clean format.
   app.use(bodyParser.json()); // Parses incoming request bodies in JSON format
   app.use(passDbAroundMiddleware(db));
 
-	// get all existing tasks
+  // get all existing tasks
   app.get("/tasks", async (req, res) => {
-    const tasks = await req.db.Task.findAll();
-    res.json(tasks.map((t) => t.toJSON()));
-    console.log(tasks);
-    res.end();
+    try {
+      const tasks = await req.db.Task.findAll();
+      res.json(tasks.map((t) => t.toJSON()));
+      res.end();
+    } catch (error) {
+      console.error(error);
+      return res.status(500).end();
+    }
   });
 
-	// create new task
+  // create new task
   app.post("/task", async (req, res) => {
+    console.log({ body: req.body });
     const { title, completed } = req.body;
-    const task = await req.db.Task.create({ title, completed });
-    res.json(task.toJSON());
+
+    let data;
+
+    try {
+      const task = await req.db.Task.create({ title, completed });
+      data = await task.toJSON();
+      res.json(data);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).end();
+    }
   });
 
+  // update task title
+  // app.patch("/task/:id", async (req, res) => {
+  //   const { title } = req.body;
+  //   const { id } = req.params;
+
+  //   try {
+  //     const newTitle = await req.db.Task.update({ title }, { where: { id } });
+  //     data = await task.toJSON();
+  //     res.json(data);
+  //   } catch (error) {
+  //     console.log(error);
+  //     return res.status(500).end();
+  //   }
+  // });
+  
   // update completed status
-	app.patch("/task/:id", async (req, res) => {
+  app.patch("/task/:id", async (req, res) => {
     const { completed } = req.body;
-  	const { id } = req.params;
-  	await req.db.Task.update({ completed }, { where: { id } });
-  	res.end();
+    const { id } = req.params;
+
+    try {
+      await req.db.Task.update(
+        {
+          completed,
+        },
+        {
+          where: { id },
+        }
+      );
+      res.end();
+    } catch (error) {
+      console.log(error);
+      return res.status(500).end();
+    }
   });
 
   // delete task
   app.delete("/task/:id", async (req, res) => {
     const { id } = req.params;
-    await req.db.Task.destroy({ where: { id } });
-  	res.end();
+
+    try {
+      await req.db.Task.destroy({
+        where: { id },
+      });
+      res.end();
+    } catch (error) {
+      console.error(error);
+      return res.status(500).end();
+    }
+  });
+
+  // delete all completed tasks
+  app.delete("/tasks/completed", async (req, res) => {
+    try {
+      await req.db.Task.destroy({
+        where: { completed: true },
+      });
+      res.end();
+    } catch (error) {
+      console.log(error);
+      return res.status(500).end();
+    }
   });
 
   // get specific task
   app.get("/task/:id", async (req, res) => {
     const { id } = req.params;
-    const task = await req.db.Task.findAll({ where: { id } });
-    res.json(task);
+
+    try {
+      const task = await req.db.Task.findAll({
+        where: { id },
+      });
+      res.json(task);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).end();
+    }
   });
 
-	// port
+  app.use(express.static("frontend"));
+
+  // port
   const port = 3000;
   app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
