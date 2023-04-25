@@ -6,9 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>To-do list</title>
     <link rel="stylesheet" href="todo.css" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+
+    <style type="text/tailwindcss">
+      @layer utilities {
+        .content-auto {
+          content-visibility: auto;
+        }
+      }
+    </style>
   </head>
   <body>
-    <h1>To-do</h1>
+    <h1 class="text-3xl font-bold underline">Hello world!</h1>
+    <h1 class="text-3xl font-bold underline">To-do</h1>
     <form id="form" method="post" class="container">
       <input class="input-field" id="task-input" type="text" value="" /> <br />
       <input class="submit-button" type="submit" value="Add todo" />
