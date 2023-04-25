@@ -1,8 +1,8 @@
-const morgan = require("morgan");
-const express = require("express");
-const bodyParser = require("body-parser");
+const morgan = require("morgan"); // Logs HTTP requests to the console in a clean format
+const express = require("express"); // Node.js framework for web
+const bodyParser = require("body-parser"); // Parses incoming request bodies in JSON format
 
-require("dotenv").config(); // library for environment variables
+require("dotenv").config(); // Library for environment variables
 
 const { initializeDB } = require("./database");
 
@@ -20,8 +20,8 @@ const main = async () => {
   const app = express(); // creates express app
 
   // middleware
-  app.use(morgan("tiny")); // Logs HTTP requests to the console in a clean format.
-  app.use(bodyParser.json()); // Parses incoming request bodies in JSON format
+  app.use(morgan("tiny"));
+  app.use(bodyParser.json());
   app.use(passDbAroundMiddleware(db));
 
   // get all existing tasks
