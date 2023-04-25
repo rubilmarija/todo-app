@@ -30,10 +30,19 @@ const getAllListItems = async () => {
 
   for (let item of data) {
     createItem(item);
+    checkCompletedStatus(item);
   }
 };
 
 getAllListItems();
+
+const checkCompletedStatus = async (item) => {
+  let statusCheckbox = document.getElementById(`checkbox-${item.id}`);
+
+  if (item.completed) {
+    statusCheckbox.checked = true;
+  }
+};
 
 const createItem = async (item) => {
   let li = document.createElement("li");
