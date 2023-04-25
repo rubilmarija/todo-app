@@ -54,22 +54,24 @@ const main = async () => {
   });
 
   // update task title
-  // app.patch("/task/:id", async (req, res) => {
-  //   const { title } = req.body;
-  //   const { id } = req.params;
+  app.patch("/task/:id/title", async (req, res) => {
+    const { title } = req.body;
+    const { id } = req.params;
 
-  //   try {
-  //     const newTitle = await req.db.Task.update({ title }, { where: { id } });
-  //     data = await task.toJSON();
-  //     res.json(data);
-  //   } catch (error) {
-  //     console.log(error);
-  //     return res.status(500).end();
-  //   }
-  // });
-  
+    let data;
+
+    try {
+      await req.db.Task.update({ title }, { where: { id } });
+      data = { title };
+      res.json(data);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).end();
+    }
+  });
+
   // update completed status
-  app.patch("/task/:id", async (req, res) => {
+  app.patch("/task/:id/status", async (req, res) => {
     const { completed } = req.body;
     const { id } = req.params;
 
