@@ -1,11 +1,26 @@
 const ul = document.getElementById("todoitems");
 const div = document.querySelector(".todoitems-container");
 
+const getToken = async () => {
+  const response = await fetch("/token", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json; charset=UTF-8",
+    },
+  });
+
+  const { token } = await response.json();
+  return token;
+};
+
 const getAllListItems = async () => {
+  const token = await getToken();
+
   const response = await fetch("/tasks", {
     method: "GET",
     headers: {
       "Content-Type": "application/json; charset=UTF-8",
+      Authorization: `Bearer ${token}`,
     },
   });
 
