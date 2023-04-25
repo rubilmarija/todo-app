@@ -1,4 +1,5 @@
 const ul = document.getElementById("todoitems");
+const div = document.querySelector(".todoitems-container");
 
 const getAllListItems = async () => {
   const response = await fetch("/tasks", {
@@ -42,7 +43,10 @@ const createItem = async (item) => {
   deleteButton.setAttribute("id", `delete-btn-${item.id}`);
 
   ul.appendChild(li);
-  li.append(titleSpan, statusCheckbox, editButton, deleteButton);
+  li.appendChild(titleSpan);
+  li.appendChild(statusCheckbox);
+  li.appendChild(editButton);
+  li.appendChild(deleteButton);
 
   statusCheckbox.addEventListener("change", async function (e) {
     e.preventDefault();
@@ -162,6 +166,7 @@ const submitEditedTitle = async (itemId) => {
 const editStatus = async (itemId, checkboxId) => {
   console.log("editStatus() called for item with id:", itemId);
 
+  const task = document.getElementById(itemId);
   const statusCheckbox = document.getElementById(checkboxId);
 
   const completed = statusCheckbox.checked;
@@ -175,6 +180,12 @@ const editStatus = async (itemId, checkboxId) => {
   });
 
   console.log("response:", response);
+
+  if (completed) {
+    task.setAttribute("class", "completed");
+  } else if (!completed) {
+    task.removeAttribute("class", "completed");
+  }
 };
 
 const deleteTask = async (itemId) => {
@@ -190,4 +201,38 @@ const deleteTask = async (itemId) => {
   console.log("response:", response);
 
   task.remove();
+};
+
+const createDeleteMultipleButton = async () => {
+  let deleteMultipleButton = document.createElement("button");
+  deleteMultipleButton.setAttribute("content", "test content");
+  deleteMultipleButton.textContent = "Delete completed tasks";
+  deleteMultipleButton.setAttribute("id", `delete-mulitple-btn`);
+
+  deleteMultipleButton.addEventListener("click", async function (e) {
+    e.preventDefault();
+
+    await deleteCompletedTasks();
+  });
+
+  div.appendChild(deleteMultipleButton);
+};
+
+createDeleteMultipleButton();
+
+const deleteCompletedTasks = async () => {
+  const completedTasks = document.querySelectorAll(".completed");
+
+  const response = await fetch(`/tasks/completed`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json; charset=UTF-8",
+    },
+  });
+
+  console.log("response:", response);
+
+  completedTasks.forEach((task) => {
+    task.remove();
+  });
 };
