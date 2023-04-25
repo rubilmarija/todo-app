@@ -23,6 +23,7 @@ const createItem = async (item) => {
   let li = document.createElement("li");
   li.id = item.id;
   li.innerHTML = `${item.title}`;
+  li.className = "list";
 
   let statusCheckbox = document.createElement("input");
   statusCheckbox.setAttribute("type", "checkbox");
@@ -30,7 +31,7 @@ const createItem = async (item) => {
 
   let deleteButton = document.createElement("button");
   deleteButton.setAttribute("content", "test content");
-  deleteButton.textContent = "Delete";
+  deleteButton.textContent = "X";
   deleteButton.setAttribute("id", `delete-btn-${item.id}`);
 
   ul.appendChild(li);
