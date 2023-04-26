@@ -26,6 +26,10 @@ const main = async () => {
 
   // get all existing tasks
   app.get("/tasks", async (req, res) => {
+    if (req.headers["authorization"] != `Bearer ${process.env.TOKEN}`) {
+      return res.status(401).end();
+    }
+
     try {
       const tasks = await req.db.Task.findAll();
       res.json(tasks.map((t) => t.toJSON()));
@@ -135,6 +139,12 @@ const main = async () => {
   });
 
   app.use(express.static("frontend"));
+
+  // get token
+  app.get("/token", (req, res) => {
+    const token = process.env.TOKEN;
+    res.json({ token });
+  });
 
   // port
   const port = 3000;

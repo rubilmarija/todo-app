@@ -1,26 +1,50 @@
-const ul = document.getElementById("todoitems");
-const div = document.querySelector(".todoitems-container");
+const todoList = document.getElementById("todoitems");
+const todoContainer = document.querySelector(".todoitems-container");
 
-const getAllListItems = async () => {
-  const response = await fetch("/tasks", {
+const getToken = async () => {
+  const response = await fetch("/token", {
     method: "GET",
     headers: {
       "Content-Type": "application/json; charset=UTF-8",
     },
   });
 
-  const data = await response.json();
+  const { token } = await response.json();
+  return token;
+};
+
+const getAllListItems = async () => {
+  const token = await getToken();
+
+  const response = await fetch("/tasks", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json; charset=UTF-8",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  let data = await response.json();
 
   console.log(data);
 
   for (let item of data) {
     createItem(item);
+    checkCompletedStatus(item);
   }
 };
 
 getAllListItems();
 
-const createItem = async (item) => {
+const checkCompletedStatus = (item) => {
+  let statusCheckbox = document.getElementById(`checkbox-${item.id}`);
+
+  if (item.completed) {
+    statusCheckbox.checked = true;
+  }
+};
+
+const createItem = (item) => {
   let li = document.createElement("li");
   li.id = item.id;
 
@@ -42,37 +66,42 @@ const createItem = async (item) => {
   deleteButton.textContent = "Delete";
   deleteButton.setAttribute("id", `delete-btn-${item.id}`);
 
-  ul.appendChild(li);
-  li.appendChild(titleSpan);
-  li.appendChild(statusCheckbox);
-  li.appendChild(editButton);
-  li.appendChild(deleteButton);
+  todoList.appendChild(li);
+  li.append(titleSpan, statusCheckbox, editButton, deleteButton);
 
-  statusCheckbox.addEventListener("change", async function (e) {
+  addTaskEventListeners(li, item);
+};
+
+const addTaskEventListeners = (li, item) => {
+  let statusCheckbox = li.querySelector(`#checkbox-${item.id}`);
+  let editButton = li.querySelector(`#edit-btn-${item.id}`);
+  let deleteButton = li.querySelector(`#delete-btn-${item.id}`);
+
+  statusCheckbox.addEventListener("change", async (e) => {
     e.preventDefault();
 
-    const itemId = e.target.parentNode.id;
-    const checkboxId = e.target.id;
+    let itemId = e.target.parentNode.id;
+    let checkboxId = e.target.id;
 
-    await editStatus(itemId, checkboxId);
+    await handleCheckboxChange(itemId, checkboxId);
   });
 
-  editButton.addEventListener("click", async function (e) {
+  editButton.addEventListener("click", async (e) => {
     e.preventDefault();
 
-    const itemId = e.target.parentNode.id;
-    const editButtonId = e.target.id;
+    let itemId = e.target.parentNode.id;
+    let editButtonId = e.target.id;
 
-    await openEditTitle(itemId, editButtonId);
+    await onEditButtonClick(itemId, editButtonId);
   });
 
-  deleteButton.addEventListener("click", async function (e) {
+  deleteButton.addEventListener("click", async (e) => {
     e.preventDefault();
 
-    const itemId = e.target.parentNode.id;
-    const deleteButtonId = e.target.id;
+    let itemId = e.target.parentNode.id;
+    let deleteButtonId = e.target.id;
 
-    await deleteTask(itemId, deleteButtonId);
+    await onDeleteButtonClick(itemId, deleteButtonId);
   });
 };
 
@@ -97,17 +126,17 @@ const addNewTask = async () => {
   createItem(data);
 };
 
-form.addEventListener("submit", async function (e) {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
   await addNewTask();
 
-  const taskInput = document.getElementById("task-input");
+  let taskInput = document.getElementById("task-input");
 
   taskInput.value = "";
 });
 
-const openEditTitle = async (itemId) => {
-  console.log("openEditTitle() called for item with id:", itemId);
+const onEditButtonClick = async (itemId) => {
+  console.log("onEditButtonClick() called for item with id:", itemId);
 
   let task = document.getElementById(itemId);
   let titleElement = document.getElementById(`title-span-${itemId}`);
@@ -125,17 +154,17 @@ const openEditTitle = async (itemId) => {
 
   task.append(editInput, editSubmitButton);
 
-  editSubmitButton.addEventListener("click", async function (e) {
+  editSubmitButton.addEventListener("click", async (e) => {
     e.preventDefault();
 
-    const editSubmitButtonId = e.target.id;
+    let editSubmitButtonId = e.target.id;
 
-    await submitEditedTitle(itemId, editSubmitButtonId);
+    await onSubmitButtonClick(itemId, editSubmitButtonId);
   });
 };
 
-const submitEditedTitle = async (itemId) => {
-  console.log("submitEditedTitle() called for item with id:", itemId);
+const onSubmitButtonClick = async (itemId) => {
+  console.log("onSubmitButtonClick() called for item with id:", itemId);
 
   let editInput = document.getElementById(`edit-input-${itemId}`);
   let editedTitle = editInput.value;
@@ -155,7 +184,7 @@ const submitEditedTitle = async (itemId) => {
   let data = await response.json();
   console.log("data:", data);
 
-  const titleElement = document.getElementById(`title-span-${itemId}`);
+  let titleElement = document.getElementById(`title-span-${itemId}`);
   console.log(titleElement);
 
   titleElement.textContent = data.title;
@@ -163,13 +192,13 @@ const submitEditedTitle = async (itemId) => {
   console.log("response:", response);
 };
 
-const editStatus = async (itemId, checkboxId) => {
-  console.log("editStatus() called for item with id:", itemId);
+const handleCheckboxChange = async (itemId, checkboxId) => {
+  console.log("handleCheckboxChange() called for item with id:", itemId);
 
-  const task = document.getElementById(itemId);
-  const statusCheckbox = document.getElementById(checkboxId);
+  let task = document.getElementById(itemId);
+  let statusCheckbox = document.getElementById(checkboxId);
 
-  const completed = statusCheckbox.checked;
+  let completed = statusCheckbox.checked;
 
   const response = await fetch(`/task/${itemId}/status`, {
     method: "PATCH",
@@ -188,8 +217,8 @@ const editStatus = async (itemId, checkboxId) => {
   }
 };
 
-const deleteTask = async (itemId) => {
-  const task = document.getElementById(itemId);
+const onDeleteButtonClick = async (itemId) => {
+  let task = document.getElementById(itemId);
 
   const response = await fetch(`/task/${itemId}`, {
     method: "DELETE",
@@ -209,19 +238,19 @@ const createDeleteMultipleButton = async () => {
   deleteMultipleButton.textContent = "Delete completed tasks";
   deleteMultipleButton.setAttribute("id", `delete-mulitple-btn`);
 
-  deleteMultipleButton.addEventListener("click", async function (e) {
+  deleteMultipleButton.addEventListener("click", async (e) => {
     e.preventDefault();
 
     await deleteCompletedTasks();
   });
 
-  div.appendChild(deleteMultipleButton);
+  todoContainer.appendChild(deleteMultipleButton);
 };
 
 createDeleteMultipleButton();
 
 const deleteCompletedTasks = async () => {
-  const completedTasks = document.querySelectorAll(".completed");
+  let completedTasks = document.querySelectorAll(".completed");
 
   const response = await fetch(`/tasks/completed`, {
     method: "DELETE",
