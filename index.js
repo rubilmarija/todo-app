@@ -40,10 +40,26 @@ const main = async () => {
     }
   });
 
+  // validation function to check if the 'title' field is empty
+  function validateTask(title, completed) {
+    const errors = [];
+
+    if (!title) {
+      errors.push('Please fill in the task!');
+    }
+    return errors;
+  }
+
   // create new task
   app.post("/task", async (req, res) => {
     console.log({ body: req.body });
     const { title, completed } = req.body;
+
+    // check if there are errors
+    const errors = validateTask(title, completed);
+    if (errors.length > 0) {
+      return res.status(400).json({ errors });
+    }
 
     let data;
 

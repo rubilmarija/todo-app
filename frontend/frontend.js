@@ -105,6 +105,7 @@ const addTaskEventListeners = (li, item) => {
   });
 };
 
+// Adding new task
 const addNewTask = async () => {
   let newTaskTitle = document.getElementById("task-input").value;
   console.log(newTaskTitle);
@@ -119,21 +120,74 @@ const addNewTask = async () => {
     },
   });
 
+  if (!response.ok) {
+    const data = await response.json();
+    const errorMsg = data.errors[0];
+    throw new Error(errorMsg);
+  }
+
   let data = await response.json();
 
   console.log(data);
 
   createItem(data);
+
+  //check if an error msg el. with the id "error-msg" exists in the DOM, if it exists, use remove() method
+
+  const errorMsg = document.getElementById("error-msg");
+  if (errorMsg) {
+    errorMsg.remove();
+  }
 };
+
+// validation function to check if the 'title' field is empty
+function validateTask(title, completed) {
+  const errors = [];
+
+  if (!title) {
+    errors.push('Please fill in the task!');
+  }
+  return errors;
+}
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
-  await addNewTask();
 
-  let taskInput = document.getElementById("task-input");
+  const title = document.getElementById("task-input").value;
+  const errors = validateTask(title);
 
-  taskInput.value = "";
-});
+  if (errors.length > 0) {
+    const errorMsg = document.getElementById("error-msg");
+    if (errorMsg) {
+      errorMsg.innerText = errors[0];
+    } else {
+      const div = document.createElement("div");
+      div.id = "error-msg";
+      div.innerText = errors[0];
+      form.parentNode.insertBefore(div, form.nextSibling);
+    }
+  } else {
+    // try catch block around the addNewTask() func. call to catch any errors thrown
+    try {
+      await addNewTask();
+      let taskInput = document.getElementById("task-input");
+      taskInput.value = "";
+    } catch (error) {
+      const errorMsg = document.getElementById("error-msg");
+
+      // check again for the error msg el., if it does, remove it, if not do nothing
+      if (errorMsg) {
+        errorMsg.innerText = error.message;
+      } else {
+        const div = document.createElement("div");
+        div.id = "error-msg";
+        div.innerText = error.message;
+        form.parentNode.insertBefore(div, form.nextSibling);
+      }
+    }
+  }
+}
+);
 
 const onEditButtonClick = async (itemId) => {
   console.log("onEditButtonClick() called for item with id:", itemId);
