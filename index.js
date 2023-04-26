@@ -30,8 +30,15 @@ const main = async () => {
       return res.status(401).end();
     }
 
+    const completed = req.query.completed;
+
     try {
-      const tasks = await req.db.Task.findAll();
+      let tasks;
+      if (req.query.completed !== undefined) {
+        tasks = await req.db.Task.findAll({ where: { completed } });
+      } else {
+        tasks = await req.db.Task.findAll();
+      }
       res.json(tasks.map((t) => t.toJSON()));
       res.end();
     } catch (error) {
