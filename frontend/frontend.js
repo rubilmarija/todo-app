@@ -63,7 +63,7 @@ const createItem = (item) => {
 
   let deleteButton = document.createElement("button");
   deleteButton.setAttribute("content", "test content");
-  deleteButton.textContent = "Delete";
+  deleteButton.textContent = "X";
   deleteButton.setAttribute("id", `delete-btn-${item.id}`);
 
   todoList.appendChild(li);

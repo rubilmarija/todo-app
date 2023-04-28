@@ -6,8 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>To-do list</title>
     <link rel="stylesheet" href="todo.css" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+
+    <style type="text/tailwindcss">
+      @layer utilities {
+        .content-auto {
+          content-visibility: auto;
+        }
+      }
+
+      @layer components {
+        .list {
+          @apply flex justify-between bg-slate-200 p-4 my-2 capitalize;
+        }
+      }
+    </style>
   </head>
   <body>
+
     <h1>To-do</h1>
 
     <form id="form" method="post" class="container">
