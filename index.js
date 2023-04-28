@@ -1,8 +1,8 @@
-const morgan = require("morgan");
-const express = require("express");
-const bodyParser = require("body-parser");
+const morgan = require("morgan"); // Logs HTTP requests to the console in a clean format
+const express = require("express"); // Node.js framework for web
+const bodyParser = require("body-parser"); // Parses incoming request bodies in JSON format
 
-require("dotenv").config(); // library for environment variables
+require("dotenv").config(); // Library for environment variables
 
 const { initializeDB } = require("./database");
 
@@ -20,14 +20,25 @@ const main = async () => {
   const app = express(); // creates express app
 
   // middleware
-  app.use(morgan("tiny")); // Logs HTTP requests to the console in a clean format.
-  app.use(bodyParser.json()); // Parses incoming request bodies in JSON format
+  app.use(morgan("tiny"));
+  app.use(bodyParser.json());
   app.use(passDbAroundMiddleware(db));
 
   // get all existing tasks
   app.get("/tasks", async (req, res) => {
+    if (req.headers["authorization"] != `Bearer ${process.env.TOKEN}`) {
+      return res.status(401).end();
+    }
+
+    const completed = req.query.completed;
+
     try {
-      const tasks = await req.db.Task.findAll();
+      let tasks;
+      if (req.query.completed !== undefined) {
+        tasks = await req.db.Task.findAll({ where: { completed } });
+      } else {
+        tasks = await req.db.Task.findAll();
+      }
       res.json(tasks.map((t) => t.toJSON()));
       res.end();
     } catch (error) {
@@ -36,10 +47,26 @@ const main = async () => {
     }
   });
 
+  // validation function to check if the 'title' field is empty
+  function validateTask(title, completed) {
+    const errors = [];
+
+    if (!title) {
+      errors.push('Please fill in the task!');
+    }
+    return errors;
+  }
+
   // create new task
   app.post("/task", async (req, res) => {
     console.log({ body: req.body });
     const { title, completed } = req.body;
+
+    // check if there are errors
+    const errors = validateTask(title, completed);
+    if (errors.length > 0) {
+      return res.status(400).json({ errors });
+    }
 
     let data;
 
@@ -54,22 +81,24 @@ const main = async () => {
   });
 
   // update task title
-  // app.patch("/task/:id", async (req, res) => {
-  //   const { title } = req.body;
-  //   const { id } = req.params;
+  app.patch("/task/:id/title", async (req, res) => {
+    const { title } = req.body;
+    const { id } = req.params;
 
-  //   try {
-  //     const newTitle = await req.db.Task.update({ title }, { where: { id } });
-  //     data = await task.toJSON();
-  //     res.json(data);
-  //   } catch (error) {
-  //     console.log(error);
-  //     return res.status(500).end();
-  //   }
-  // });
-  
+    let data;
+
+    try {
+      await req.db.Task.update({ title }, { where: { id } });
+      data = { title };
+      res.json(data);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).end();
+    }
+  });
+
   // update completed status
-  app.patch("/task/:id", async (req, res) => {
+  app.patch("/task/:id/status", async (req, res) => {
     const { completed } = req.body;
     const { id } = req.params;
 
@@ -133,6 +162,12 @@ const main = async () => {
   });
 
   app.use(express.static("frontend"));
+
+  // get token
+  app.get("/token", (req, res) => {
+    const token = process.env.TOKEN;
+    res.json({ token });
+  });
 
   // port
   const port = 3000;

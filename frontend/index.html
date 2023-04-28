@@ -23,30 +23,17 @@
     </style>
   </head>
   <body>
-    <div
-      class="h-screen w-screen p-4 bg-gradient-to-b from-[#181818] to-[#202020]"
-    >
-      <div
-        class="bg-slate-100 max-w-[500px] w-full m-auto rounded-md shadow-xl p-4"
-      >
-        <h2 class="text-3xl font-bold text-center text-gray-800 p-2">To-do</h2>
-        <form id="form" method="post" class="flex justify-between">
-          <input
-            class="border p-2 w-full text-xl"
-            id="task-input"
-            type="text"
-            value=""
-          />
 
-          <input
-            class="border p-4 ml-2 bg-purple-600 text-slate-100"
-            type="submit"
-            value="Add todo"
-          />
-        </form>
-        <ul id="todoitems"></ul>
-        <script src="./frontend.js"></script>
-      </div>
+    <h1>To-do</h1>
+
+    <form id="form" method="post" class="container">
+      <input class="input-field" id="task-input" type="text" value="" /> <br />
+      <input class="submit-button" type="submit" value="Add todo" />
+      <p id="error-msg"></p>
+    </form>
+    <div class="todoitems-container">
+      <ul id="todoitems"></ul>
     </div>
+    <script src="./frontend.js"></script>
   </body>
 </html>
