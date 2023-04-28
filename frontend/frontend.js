@@ -47,6 +47,7 @@ const checkCompletedStatus = (item) => {
 const createItem = (item) => {
   let li = document.createElement("li");
   li.id = item.id;
+  li.className = "list";
 
   let titleSpan = document.createElement("span");
   titleSpan.setAttribute("id", `title-span-${item.id}`);
@@ -145,7 +146,7 @@ function validateTask(title, completed) {
   const errors = [];
 
   if (!title) {
-    errors.push('Please fill in the task!');
+    errors.push("Please fill in the task!");
   }
   return errors;
 }
@@ -186,8 +187,7 @@ form.addEventListener("submit", async (e) => {
       }
     }
   }
-}
-);
+});
 
 const onEditButtonClick = async (itemId) => {
   console.log("onEditButtonClick() called for item with id:", itemId);
