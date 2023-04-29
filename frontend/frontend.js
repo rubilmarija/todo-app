@@ -291,6 +291,7 @@ const createDeleteMultipleButton = async () => {
   deleteMultipleButton.setAttribute("content", "test content");
   deleteMultipleButton.textContent = "Delete completed tasks";
   deleteMultipleButton.setAttribute("id", `delete-mulitple-btn`);
+  deleteMultipleButton.className = "deleteAllTodos";
 
   deleteMultipleButton.addEventListener("click", async (e) => {
     e.preventDefault();
