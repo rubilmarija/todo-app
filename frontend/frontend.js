@@ -68,7 +68,7 @@ const createItem = (item) => {
   deleteButton.setAttribute("id", `delete-btn-${item.id}`);
 
   todoList.appendChild(li);
-  li.append(titleSpan, statusCheckbox, editButton, deleteButton);
+  li.append(statusCheckbox, titleSpan, editButton, deleteButton);
 
   addTaskEventListeners(li, item);
 };
