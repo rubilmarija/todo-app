@@ -1,5 +1,6 @@
 const todoList = document.getElementById("todoitems");
 const todoContainer = document.querySelector(".todoitems-container");
+// let editTaskInProgress = false;
 
 const getToken = async () => {
   const response = await fetch("/token", {
@@ -61,6 +62,9 @@ const createItem = (item) => {
   editButton.setAttribute("content", "test content");
   editButton.textContent = "Edit";
   editButton.setAttribute("id", `edit-btn-${item.id}`);
+  // editTaskInProgress;
+  editButton.style.display = "block";
+  // console.log(editTaskInProgress);
 
   let deleteButton = document.createElement("button");
   deleteButton.setAttribute("content", "test content");
@@ -92,6 +96,8 @@ const addTaskEventListeners = (li, item) => {
 
     let itemId = e.target.parentNode.id;
     let editButtonId = e.target.id;
+
+    editButton.style.display = "none";
 
     await onEditButtonClick(itemId, editButtonId);
   });
@@ -213,6 +219,14 @@ const onEditButtonClick = async (itemId) => {
 
     let editSubmitButtonId = e.target.id;
 
+    console.log("Button chech gftrddyrdrt", editSubmitButton);
+
+    let newId = editSubmitButton
+      .getAttribute("id")
+      .replace("edit-submit-btn", "edit-btn");
+
+    document.getElementById(newId).style.display = "block";
+
     await onSubmitButtonClick(itemId, editSubmitButtonId);
   });
 };
@@ -265,9 +279,9 @@ const handleCheckboxChange = async (itemId, checkboxId) => {
   console.log("response:", response);
 
   if (completed) {
-    task.setAttribute("class", "completed");
-  } else if (!completed) {
-    task.removeAttribute("class", "completed");
+    task.setAttribute("class", "completed list");
+  } else {
+    task.setAttribute("class", "list");
   }
 };
 

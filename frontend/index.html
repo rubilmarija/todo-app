@@ -17,11 +17,15 @@
 
       @layer components {
         .list {
-          @apply flex justify-between bg-slate-200 p-4 my-2 capitalize;
+          @apply flex justify-between bg-slate-200 p-4 rounded-md my-2 capitalize;
+        }
+
+        .completed {
+          @apply flex justify-between bg-slate-500 p-4 my-2 capitalize;
         }
 
         .deleteAllTodos {
-          @apply border p-4  bg-purple-600 text-slate-100;
+          @apply border p-4 rounded-md bg-purple-600 text-slate-100;
         }
       }
     </style>
@@ -36,13 +40,13 @@
         <h2 class="text-3xl font-bold text-center text-gray-800 p-2">To-do</h2>
         <form id="form" method="post" class="flex justify-between container">
           <input
-            class="border p-2 w-full text-xl input-field"
+            class="border p-2 w-full rounded-md text-xl input-field"
             id="task-input"
             type="text"
             value=""
           />
           <input
-            class="border p-4 ml-2 bg-purple-600 text-slate-100 submit-button"
+            class="border p-4 ml-2 bg-purple-600 text-slate-100 rounded-md submit-button"
             type="submit"
             value="Add todo"
           />
