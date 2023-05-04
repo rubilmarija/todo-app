@@ -47,18 +47,8 @@ const main = async () => {
     }
   });
 
-  // validation function to check if the 'title' field is empty
-  function validateTask(title, completed) {
-    const errors = [];
-
-    if (!title) {
-      errors.push('Please fill in the task!');
-    }
-    return errors;
-  }
-
   // create new task
-  app.post("/task", async (req, res) => {
+  app.post("/tasks", async (req, res) => {
     console.log({ body: req.body });
     const { title, completed } = req.body;
 

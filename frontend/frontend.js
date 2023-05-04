@@ -117,7 +117,7 @@ const addNewTask = async () => {
   let newTaskTitle = document.getElementById("task-input").value;
   console.log(newTaskTitle);
 
-  const response = await fetch("/task", {
+  const response = await fetch("/tasks", {
     method: "POST",
     body: JSON.stringify({
       title: newTaskTitle,
@@ -334,3 +334,12 @@ const deleteCompletedTasks = async () => {
     task.remove();
   });
 };
+
+function validateTask(title, completed) {
+  const errors = [];
+
+  if (!title) {
+    errors.push("Please fill in the task!");
+  }
+  return errors;
+}
